@@ -1,0 +1,29 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: messenger_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: messenger_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Use internal docker network service name to connect to mongodb service
+      - MONGO_URL=mongodb://mongodb:27017/
+    depends_on:
+      - mongodb
+
+volumes:
+  mongo_data:
+    driver: local
