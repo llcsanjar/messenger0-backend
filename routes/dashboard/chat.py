@@ -834,7 +834,10 @@ async def websocket_chat(websocket: WebSocket):
                     if not existing_msg:
                         continue
                     sender = user_collection.find_one({"email": sender_email})
-                    if not sender or str(existing_msg["sender_id"]) != str(sender["_id"]):
+                    if not sender:
+                        continue
+                    # Only the sender can delete for everyone
+                    if delete_type == "for_everyone" and str(existing_msg["sender_id"]) != str(sender["_id"]):
                         continue
                     if existing_msg.get("is_deleted_for_everyone", False):
                         continue
